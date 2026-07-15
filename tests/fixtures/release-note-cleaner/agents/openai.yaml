@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Note Cleaner"
+  short_description: "Normalize one release-note entry safely"
+  default_prompt: "Use $release-note-cleaner to normalize this release-note entry without changing its facts."
