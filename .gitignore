@@ -1,2 +1,5 @@
 .agents/
 skills-lock.json
+.tmp/
+__pycache__/
+*.py[cod]

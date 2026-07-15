@@ -190,23 +190,27 @@ finding IDs, raw counts, causal grouping, and skipped checks.
 
 ## Install
 
-Skill Polisher is currently a local pre-release repository. A public remote installation command will
-be documented only after remote publication and fresh-install verification actually succeed.
-
-### Option A: Agent Skills installer from the local repository
-
-From this repository root:
+### Option A: Agent Skills installer
 
 ```bash
-npx skills add . --skill skill-polisher
+npx skills@latest add Conradgui/skill-polisher
 ```
 
-`skills@1.5.17` has been exercised against this structure and discovered exactly one installable
-skill.
+Select `skill-polisher` and Codex when prompted.
 
-### Option B: Manual Codex copy
+### Option B: Codex Skill Installer
 
-Copy `skills/skill-polisher` into `$CODEX_HOME/skills/skill-polisher`, or into
+Ask Codex:
+
+```text
+Use $skill-installer to install the skill at
+https://github.com/Conradgui/skill-polisher/tree/main/skills/skill-polisher
+```
+
+### Option C: Manual copy
+
+Clone or download the repository, then copy `skills/skill-polisher` into
+`$CODEX_HOME/skills/skill-polisher`, or into
 `~/.codex/skills/skill-polisher` when `CODEX_HOME` is unset. Restart or begin a new Codex turn after
 installation so the skill is discovered.
 
@@ -247,9 +251,13 @@ If the task is to create a new capability or rebuild under a new identity, use
 skill-polisher/
 ├── README.md
 ├── README.zh.md
+├── CONTRIBUTING.md
+├── CONTRIBUTING.zh.md
 ├── CHANGELOG.md
+├── VERSION
 ├── LICENSE
 ├── NOTICE.md
+├── .github/workflows/validate.yml
 ├── docs/
 │   ├── DESIGN.md
 │   ├── DESIGN.zh.md
@@ -257,7 +265,10 @@ skill-polisher/
 │   └── REAL_WORLD_EVALUATION.zh.md
 ├── tests/
 │   ├── BEHAVIOR_CASES.md
+│   ├── test_validate_repository.py
 │   └── fixtures/release-note-cleaner/
+├── scripts/
+│   └── validate_repository.py
 └── skills/skill-polisher/
     ├── SKILL.md
     ├── license.txt
@@ -279,11 +290,13 @@ human documentation mirrors project information without adding runtime rules.
 - Current runtime size: one 130-line-class `SKILL.md` plus two conditional references; no bundled
   script or capability manifest is currently justified.
 - Local structure and quality lint: pass with zero warnings after the current iteration.
-- Local `npx skills` installation: previously verified with one discovered skill and zero
-  source-to-installed drift; it is rechecked whenever runtime files change.
+- Release candidate: `v0.1.0`; Windows and Ubuntu CI run the same repository and skill checks.
+- Local `npx skills` installation: verified with one discovered skill and zero source-to-installed
+  drift.
 - Real-world evidence: four pinned repositories on the current Windows environment.
-- Not yet claimed: public remote, remote CI, tag, GitHub Release, fresh-remote installation, Linux or
-  macOS execution, or fresh-independent-agent invocation transfer.
+- Pending until the release gates complete: public remote, remote CI result, tag, GitHub Release,
+  and fresh-remote installation.
+- Not claimed by this release: macOS execution or fresh-independent-agent invocation transfer.
 
 ## Attribution and independence
 

@@ -154,21 +154,26 @@ Polisher 分别报告 runtime source、harness metadata、repository contract、
 
 ## 安装
 
-Skill Polisher 当前仍是本地预发布仓库。只有远程发布和 fresh install 真正通过后，才会补充公开远程安装命令。
-
-### 方式 A：从本地仓库使用 Agent Skills installer
-
-在仓库根目录运行：
+### 方式 A：Agent Skills installer
 
 ```bash
-npx skills add . --skill skill-polisher
+npx skills@latest add Conradgui/skill-polisher
 ```
 
-`skills@1.5.17` 已验证该结构只发现一个可安装 Skill。
+根据提示选择 `skill-polisher` 和 Codex。
 
-### 方式 B：手动复制到 Codex
+### 方式 B：Codex Skill Installer
 
-将 `skills/skill-polisher` 复制到 `$CODEX_HOME/skills/skill-polisher`；如果未设置 `CODEX_HOME`，则复制到 `~/.codex/skills/skill-polisher`。安装后重启或开始新的 Codex turn，以便发现新 Skill。
+向 Codex 提出：
+
+```text
+使用 $skill-installer 安装以下 Skill：
+https://github.com/Conradgui/skill-polisher/tree/main/skills/skill-polisher
+```
+
+### 方式 C：手动复制
+
+克隆或下载仓库，然后将 `skills/skill-polisher` 复制到 `$CODEX_HOME/skills/skill-polisher`；如果未设置 `CODEX_HOME`，则复制到 `~/.codex/skills/skill-polisher`。安装后重启或开始新的 Codex turn，以便发现新 Skill。
 
 ## 使用
 
@@ -204,9 +209,13 @@ npx skills add . --skill skill-polisher
 skill-polisher/
 ├── README.md
 ├── README.zh.md
+├── CONTRIBUTING.md
+├── CONTRIBUTING.zh.md
 ├── CHANGELOG.md
+├── VERSION
 ├── LICENSE
 ├── NOTICE.md
+├── .github/workflows/validate.yml
 ├── docs/
 │   ├── DESIGN.md
 │   ├── DESIGN.zh.md
@@ -214,7 +223,10 @@ skill-polisher/
 │   └── REAL_WORLD_EVALUATION.zh.md
 ├── tests/
 │   ├── BEHAVIOR_CASES.md
+│   ├── test_validate_repository.py
 │   └── fixtures/release-note-cleaner/
+├── scripts/
+│   └── validate_repository.py
 └── skills/skill-polisher/
     ├── SKILL.md
     ├── license.txt
@@ -233,9 +245,11 @@ skill-polisher/
 - 运行依赖：除了 active agent 的常规仓库与测试工具之外，无额外依赖。
 - 当前运行时规模：约 130 行 `SKILL.md` 和两个条件 reference；当前没有证据支持 bundled script 或 capability manifest。
 - 本地结构与 quality lint：本轮迭代后零 warning 通过。
-- 本地 `npx skills` 安装：之前已验证只发现一个 Skill 且源码到安装副本零漂移；运行时变化后会重新检查。
+- Release candidate：`v0.1.0`；Windows 与 Ubuntu CI 运行相同的仓库和 Skill 检查。
+- 本地 `npx skills` 安装：已验证只发现一个 Skill，且源码到安装副本零漂移。
 - 真实仓库证据：当前 Windows 环境中的四个 pinned repository。
-- 尚未声称：public remote、remote CI、tag、GitHub Release、fresh-remote install、Linux/macOS 执行或全新独立 Agent invocation transfer。
+- 发布 gate 完成前仍待验证：public remote、remote CI 结果、tag、GitHub Release 与 fresh-remote install。
+- 本次 release 不声称：macOS 执行或全新独立 Agent invocation transfer。
 
 ## 归属与独立性
 
