@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Published the first public repository contract with pinned Windows/Ubuntu CI, semantic version
+  state, repository validation, regression tests, and verified Codex installation from GitHub.
 - Initial `skill-polisher` runtime with Review, Polish, Recheck, and release-drift branches.
 - Proportional-evidence stopping rules and a default read-only authority boundary.
 - Creator Pro handoff for new identities and full rebuilds.

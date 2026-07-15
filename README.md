@@ -290,12 +290,17 @@ human documentation mirrors project information without adding runtime rules.
 - Current runtime size: one 130-line-class `SKILL.md` plus two conditional references; no bundled
   script or capability manifest is currently justified.
 - Local structure and quality lint: pass with zero warnings after the current iteration.
-- Release candidate: `v0.1.0`; Windows and Ubuntu CI run the same repository and skill checks.
+- Release: `v0.1.0`; [Windows and Ubuntu CI](https://github.com/Conradgui/skill-polisher/actions/workflows/validate.yml)
+  run the same repository and skill checks.
 - Local `npx skills` installation: verified with one discovered skill and zero source-to-installed
   drift.
+- Public source: fresh-cloned and validated from GitHub at the intended release commit.
+- Codex Skill Installer: the public skill URL installed into an isolated `CODEX_HOME`; all five
+  runtime files matched the remote source by relative path and SHA-256.
+- Agent Skills remote transport: the direct `npx` GitHub command reached the public URL but this
+  release runner's Git connection reset on three attempts. Installation from the fresh public clone
+  passed; a direct-transport success is not claimed for this environment.
 - Real-world evidence: four pinned repositories on the current Windows environment.
-- Pending until the release gates complete: public remote, remote CI result, tag, GitHub Release,
-  and fresh-remote installation.
 - Not claimed by this release: macOS execution or fresh-independent-agent invocation transfer.
 
 ## Attribution and independence

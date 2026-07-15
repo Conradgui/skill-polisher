@@ -245,10 +245,12 @@ skill-polisher/
 - 运行依赖：除了 active agent 的常规仓库与测试工具之外，无额外依赖。
 - 当前运行时规模：约 130 行 `SKILL.md` 和两个条件 reference；当前没有证据支持 bundled script 或 capability manifest。
 - 本地结构与 quality lint：本轮迭代后零 warning 通过。
-- Release candidate：`v0.1.0`；Windows 与 Ubuntu CI 运行相同的仓库和 Skill 检查。
+- Release：`v0.1.0`；[Windows 与 Ubuntu CI](https://github.com/Conradgui/skill-polisher/actions/workflows/validate.yml)运行相同的仓库和 Skill 检查。
 - 本地 `npx skills` 安装：已验证只发现一个 Skill，且源码到安装副本零漂移。
+- 公开源码：已经从 GitHub fresh clone，并在预期 release commit 上完成验证。
+- Codex Skill Installer：公开 Skill URL 已安装到隔离 `CODEX_HOME`；5 个运行时文件按相对路径和 SHA-256 与远端源码一致。
+- Agent Skills 远程传输：直接 `npx` GitHub 命令已经到达公开 URL，但当前 release runner 的 Git 连接连续三次被重置；从 fresh public clone 执行安装已通过，因此本环境不声称 direct transport 成功。
 - 真实仓库证据：当前 Windows 环境中的四个 pinned repository。
-- 发布 gate 完成前仍待验证：public remote、remote CI 结果、tag、GitHub Release 与 fresh-remote install。
 - 本次 release 不声称：macOS 执行或全新独立 Agent invocation transfer。
 
 ## 归属与独立性
