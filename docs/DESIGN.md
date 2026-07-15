@@ -46,6 +46,19 @@ Contract, system, evolution, and evidence answer different questions. Combining 
 would let strong documentation hide a broken caller or let extensive tests hide a wrong outcome.
 Findings keep their axis and evidence.
 
+### Causal findings instead of failure-count theater
+
+A broad suite may emit many failures from one missing runtime, permission, or path adapter. Skill
+Polisher preserves raw counts but attributes each non-pass result before creating findings, then
+collapses repeated symptoms under the earliest evidenced common cause. This prevents environmental
+noise from outranking the behavior and architecture under review.
+
+### Preserve, change, and evidence limits
+
+Mature-skill maintenance needs an explicit preservation decision, not only a defect list. The report
+therefore names learned invariants to preserve, evidence-backed changes worth making, and limits that
+bound the supported claims. This makes a no-change decision as auditable as a patch recommendation.
+
 ### No bundled scripts or capability manifest
 
 The current workflow is linear and tool-agnostic. Existing platform validators already check skill
@@ -70,9 +83,13 @@ Three real skill systems supplied architecture studies:
 | `project-verifier` | Progress, outcome, execution scope, and claim eligibility must not be collapsed |
 | `paper-review` | Review and mutation require different modes; edits may need an invariant ledger and rechecks need stable IDs |
 
+A fourth study, `zero-to-one-product-discovery`, added evidence for controller-owned routing,
+stage-pure orchestration, narrow persistent state, and machine-validated artifact boundaries. The
+expanded [real-world evaluation](./REAL_WORLD_EVALUATION.md) records the commands and feedback loop.
+
 These studies also exposed a weakness in snapshot-only review: incidental Windows findings can be
 real without being the highest-value architectural conclusion. Skill Polisher explicitly ranks
 behavior and architecture first unless platform behavior breaks a support claim.
 
 The projects remain independent. This repository does not claim that Matt Pocock, OpenAI, or the
-three study repositories define or endorse Skill Polisher's workflow.
+four study repositories define or endorse Skill Polisher's workflow.

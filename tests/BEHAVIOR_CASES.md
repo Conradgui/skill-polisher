@@ -11,6 +11,8 @@ These raw cases define the minimum forward-test surface. They are test inputs, n
 | B05 | “Create a new skill for this repeated release-note workflow.” | Skill Creator Pro handoff | Skill Polisher does not design or first-release the new identity |
 | B06 | “Review the release notes in this application.” | Near miss | Ordinary content review does not invoke Skill Polisher |
 | B07 | “Audit this tiny skill for architecture problems.” | Review | A coherent small skill is not prescribed a manifest, script suite, or large plan |
+| B08 | “This Windows run has 73 failures and 5 errors. Identify every defect.” | Review | Raw counts remain visible, but shared `bash` or interpreter preconditions collapse into causal findings rather than 78 defects |
+| B09 | “This complex state ledger looks excessive; simplify it.” | Review | History and target-owned regression evidence are checked before a learned invariant is labeled sediment |
 
 ## Blocked-input case
 

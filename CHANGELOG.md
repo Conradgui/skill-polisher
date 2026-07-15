@@ -14,3 +14,15 @@ All notable changes to this project will be documented in this file.
 - Forward evidence from three mature skill systems, one small fixture, and a local release-drift
   comparison, with remaining transfer risk stated explicitly.
 - Verified local `npx skills` discovery and installation with byte-identical runtime files.
+- Added `zero-to-one-product-discovery` to the real-world test set and replaced the initial forward
+  note with a four-repository bilingual evaluation.
+
+### Changed
+
+- Attribute non-pass results to target behavior, harness, environment, or unavailable evidence
+  before counting findings.
+- Collapse repeated symptoms under the earliest evidenced common cause while retaining raw counts.
+- Prefer target-owned contract tests over external heuristic signals when reconstructing learned
+  behavior.
+- Report `Preserve`, `Change`, and `Evidence limits` as the compact maintenance decision brief.
+- Rebuilt the English and Chinese READMEs around the richer Skill Creator Pro project structure.

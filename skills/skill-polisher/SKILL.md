@@ -76,6 +76,10 @@ For an iterated skill, distinguish:
 - a **learned invariant**: a mechanism that protects a demonstrated requirement or prior failure;
 - **sediment**: duplicated, superseded, unreachable, or no-longer-enforced material.
 
+Before recommending deletion, simplification, or consolidation of a nontrivial mechanism, find the
+requirement, failure, or decision that introduced it. When that evidence is unavailable, report the
+uncertainty instead of labeling the mechanism sediment.
+
 Absence of history is an evidence limit, not a defect. A small coherent skill does not need the
 layers of a large collection.
 
@@ -95,8 +99,15 @@ Reproduce the user's symptom when safe and decision-relevant. Test the affected 
 plausible near miss before widening coverage. Rank behavioral and architectural impact before
 incidental platform mechanics, unless the platform issue contradicts an explicit support claim.
 
+Prefer target-owned contract and regression tests when they encode learned behavior; use external
+validators and lint as supplementary evidence. Attribute every non-pass result to target behavior,
+the test harness or adapter, an unmet environment precondition, or unavailable evidence before
+counting findings. Collapse repeated symptoms under the earliest evidenced common cause while
+retaining the raw test counts.
+
 **Done when:** each conclusion belongs to one axis, cites direct evidence, and states whether it is a
-confirmed defect, design risk, evidence gap, or intentional tradeoff.
+confirmed defect, design risk, evidence gap, or intentional tradeoff; repeated failures are not
+misreported as independent defects.
 
 ### 5. Decide and report
 
@@ -106,10 +117,11 @@ Pass each candidate issue through three filters:
 - **Delivery economics**: is the risk reduction worth the edit, tooling, testing, and coordination?
 - **Architecture integrity**: does the remedy preserve ownership, callers, state, and evolution?
 
-Report actionable findings first. Give recheckable findings stable IDs and include the claim,
-evidence, impact, confidence, and smallest justified action. State when the evidence contradicts the
-user's proposed cause. A no-finding result is valid when the contract is coherent and the evidence
-does not justify change.
+Open with a compact decision brief: **Preserve** learned invariants, **Change** justified findings,
+and **Evidence limits** that bound the claims. Give recheckable findings stable IDs and include the
+claim, evidence, impact, confidence, and smallest justified action. State when the evidence
+contradicts the user's proposed cause. A no-finding result is valid when the contract is coherent and
+the evidence does not justify change.
 
 Close with checks performed, checks intentionally skipped, and the resulting evidence boundary.
 
