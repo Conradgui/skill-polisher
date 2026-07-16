@@ -1,7 +1,7 @@
 interface:
   display_name: "Skill Polisher"
   short_description: "Review and refine existing agent skills"
-  default_prompt: "Use $skill-polisher to review this existing skill, explain the evidence, and make only authorized minimal improvements."
+  default_prompt: "Use $skill-polisher to review this existing skill, produce a decision-ready Maintenance Ledger, and make only user-approved improvements."
 
 policy:
   allow_implicit_invocation: true

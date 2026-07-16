@@ -2,6 +2,8 @@
 
 [English](./REAL_WORLD_EVALUATION.md)
 
+> **历史证据快照：** 以下结果记录固定 revision，以及一次开发会话当时可用的 Windows、模型和工具环境。它们用于保存因果证据，不构成当前兼容性矩阵、跨平台认证或当前模型 benchmark。
+
 Skill Polisher 使用四个独立开发的公开 Skill 仓库作为只读测试对象：
 
 1. [`Conradgui/Academic-Paper-Review-Skill`](https://github.com/Conradgui/Academic-Paper-Review-Skill/tree/9f3288f7a13e25400a8ff0c00eeb16270e37fe98)

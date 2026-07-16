@@ -2,6 +2,10 @@
 
 [简体中文](./REAL_WORLD_EVALUATION.zh.md)
 
+> **Historical evidence snapshot:** the results below record pinned repositories and the Windows,
+> model, and tooling context available in one authoring session. They preserve causal evidence; they
+> are not a current compatibility matrix, cross-platform certification, or current-model benchmark.
+
 Four independently developed public skill repositories were used as read-only test objects for
 Skill Polisher:
 

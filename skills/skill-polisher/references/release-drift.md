@@ -2,7 +2,8 @@
 
 Read this reference when an existing skill may differ across its runtime folder, repository,
 published artifact, or installed copy. Keep the audit read-only unless the user separately requests
-repair or publication.
+repair or publication. A standalone drift audit does not require Recheck. A release-readiness claim
+does require a current Recheck bound to the runtime revision.
 
 ## Reconstruct release state
 
@@ -30,3 +31,14 @@ release-affecting change or an explicit support claim makes them decision-releva
 When drift is found, identify the authoritative owner before recommending synchronization. Preserve
 attribution and coexistence with upstream or neighboring skill identities. Route a first release or
 new identity through `Skill Creator Pro`; keep maintenance of an existing release in Skill Polisher.
+
+## Sequence a release path
+
+1. Confirm that the Maintenance Ledger contains a completed Recheck for the exact runtime content.
+2. Audit the relevant release layers and append their separate states to the ledger.
+3. If an authorized repair changes runtime content, mark Recheck stale and return to the explicit
+   Recheck confirmation gate.
+4. If a repair changes only release metadata or human documentation, rerun the affected release
+   gates while preserving the runtime Recheck result.
+5. Require separate authority before commit, push, tag, release, installation, credentials, or any
+   other external mutation not already authorized.
