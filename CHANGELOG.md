@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added a Maintenance Ledger runtime reference and lifecycle contract regressions for review
+  packets, explicit decisions, Polish evidence, Recheck confirmation, and release sequencing.
+- Added a read-only Recheck documentation reconciliation that maps current behavior, rationale,
+  iteration history, executable contracts, and detailed evidence to their owning surfaces.
+
+### Changed
+
+- Replaced the parallel mode picker with a Review -> decision -> Polish -> confirmed Recheck
+  maintenance lifecycle while preserving direct entry for already approved findings and standalone
+  drift audits.
+- Require a user-reviewable evidence packet after Review, each Polish batch, and Recheck.
+- Separate user `decision`, `polish_state`, and `recheck_outcome` so accepted risk cannot be mistaken
+  for resolved evidence.
+- Treat commits, completed Polish batches, handoffs, and release preparation as reasons to offer
+  Recheck; require explicit user confirmation before starting it.
+- Require a current runtime Recheck before claiming release readiness and invalidate it only when
+  runtime content changes.
+- Keep the README compatibility summary environment-neutral and move one-session platform, installer,
+  and model limitations to the historical real-world evaluation.
+
+### Removed
+
+- Removed direct broad-improvement-to-Polish routing, automatic Recheck assumptions, and the use of
+  accepted risk as a resolution signal. Approved-finding Polish and standalone drift audits remain.
+
 ## [0.1.0] - 2026-07-15
 
 ### Added

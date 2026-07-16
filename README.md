@@ -11,8 +11,9 @@ protects learned invariants; and applies only the smallest authorized change the
 **Why this layer matters:** a skill maintainer determines whether operational knowledge compounds
 through iteration or is erased by surface-level cleanup.
 
-Review is read-only by default. A direct request to fix or improve the named local skill selects the
-Polish branch; remote publication, credentials, live effects, and a new identity remain separate
+Review is read-only by default. A broad improvement request starts with a decision-ready Review;
+Polish applies only user-approved findings; complete Recheck starts only after explicit user
+confirmation. Remote publication, credentials, live effects, and a new identity remain separate
 authorities.
 
 ## What problem does it solve?
@@ -29,7 +30,8 @@ list while missing why the system works.
 | Optimize for maximum test coverage | Small changes consume disproportionate time and tools | Use the minimum evidence capable of changing the diagnosis, action, or claim |
 | Accept the user's proposed cause as final | The patch may solve the explanation rather than the observed problem | Treat the symptom as evidence and the proposed cause as a hypothesis |
 | Report only problems | Maintainers cannot see what architecture must survive the patch | Report `Preserve`, `Change`, and `Evidence limits` |
-| Let review silently become rewriting | Scope and authority expand without a deliberate decision | Keep Review read-only; make Polish, Recheck, and rebuild handoff explicit |
+| Let review silently become rewriting | Scope and authority expand without a deliberate decision | Stop at a finding-level user decision gate before Polish |
+| Treat each stage as a separate chat answer | Findings, approvals, changes, and evidence drift across turns | Keep one Maintenance Ledger and append a reviewable packet after each stage |
 | Treat local validity as release validity | Source, metadata, docs, CI, publication, and installation drift apart | Audit each release state separately |
 
 The goal is not to make every review large. It is to make every consequential maintenance decision
@@ -95,6 +97,14 @@ This is not an official list authored or endorsed by Matt Pocock.
 
 ## What changed?
 
+The unreleased lifecycle iteration **adds** one cross-stage Maintenance Ledger and reviewable stage
+packets; **changes** broad improvement into Review -> decision -> approved Polish -> confirmed
+Recheck, with a documentation reconciliation at closure; and **retires** direct broad-Polish routing,
+automatic Recheck assumptions, and accepted risk as a resolution signal. README owns the current
+user-facing summary, the [design record](./docs/DESIGN.md) owns rationale, the
+[changelog](./CHANGELOG.md) owns version differences, and the Maintenance Ledger owns detailed
+finding evidence.
+
 ### 1. A living behavior contract
 
 Review starts from the outcome, trigger branches, near misses, inputs and state, outputs and side
@@ -126,8 +136,8 @@ Every non-pass check is first attributed to target behavior, a harness or adapte
 environment precondition, or unavailable evidence. Raw test counts remain visible, but repeated
 symptoms are grouped under the earliest evidenced common cause.
 
-This prevents one missing `bash`, one Windows symlink privilege, or one unsafe path conversion from
-becoming dozens of fictional architecture findings.
+This prevents one missing runtime, permission, or path adapter from becoming dozens of fictional
+architecture findings.
 
 ### 5. Proportional verification
 
@@ -139,29 +149,37 @@ edit, or claim. Stop when the original behavior is evidenced, high-impact uncert
 and another plausible check cannot change the decision. State skipped checks when they narrow the
 supported claim.
 
-### 6. Review, Polish, and Recheck boundaries
+### 6. Review, decision, Polish, and Recheck lifecycle
 
-| Mode | Outcome | Mutation |
+| Stage | User-reviewable output | Gate |
 |---|---|---|
-| **Review** | Diagnose behavior, architecture, evolution, and evidence | Read-only |
-| **Polish** | Apply the smallest evidence-backed improvement | Explicit local request required |
-| **Recheck** | Reassess stable findings against a changed artifact | Read-only unless another fix is requested |
-| **Release drift** | Compare runtime, repository, metadata, version, CI, publication, and installation | Read-only by default |
+| **Review** | Preserve, findings, evidence limits, checks, and decision table | Stop; user sets each finding to `FIX_NOW`, `DEFER`, `ACCEPT_RISK`, or `REJECT` |
+| **Polish** | What changed, how, files, omissions, targeted evidence, achieved effect, and residual risk | Stop after each approved batch |
+| **Recheck confirmation** | One focused question when a candidate is submitted or may be complete | Explicit user confirmation required; a commit or silence is not consent |
+| **Recheck** | Per-finding outcomes, regressions, evidence limits, and readiness for the stated purpose | Read-only; remaining issues return to the decision gate |
+| **Release Drift** | Runtime, metadata, repository, version, CI, remote, and installed states | Standalone audit anytime; release readiness consumes a current Recheck |
 
-Polish protects unrelated user changes and records only the invariants the edit can actually harm. A
-small metadata fix needs a short invariant note, not a ceremonial ledger; high-consequence state,
-claims, identifiers, citations, or authorization may justify a durable ledger.
+Polish uses targeted verification for the approved batch rather than performing a comprehensive
+Recheck after every change. Recheck is comprehensive across the decision surface—not necessarily
+every available test—and starts only after the user says to run it. A current request such as “run
+Recheck now” is already the confirmation; otherwise the agent asks and waits.
 
-### 7. A maintenance decision brief
+### 7. One Maintenance Ledger, separate state dimensions
 
-Every substantial result opens with:
+The Maintenance Ledger is the authority across stages. Review creates stable findings and decisions;
+each Polish batch appends its diff and evidence; Recheck adds current outcomes without rewriting the
+history. When no evidence path is authorized, Review returns the complete Markdown ledger as
+`NON_DURABLE` and keeps the target unchanged.
 
-- **Preserve:** learned invariants and coherent boundaries that should survive;
-- **Change:** evidence-backed findings worth their delivery cost;
-- **Evidence limits:** missing checks or access that narrow the claim.
+The ledger separates:
 
-Recheckable findings receive stable IDs, direct evidence, impact, confidence, and the smallest
-justified action. A no-change conclusion is valid when the evidence supports it.
+- `decision`: `PENDING`, `FIX_NOW`, `DEFER`, `ACCEPT_RISK`, or `REJECT`;
+- `polish_state`: `NOT_STARTED`, `IMPLEMENTED`, `PARTIAL`, or `NOT_APPLICABLE`;
+- `recheck_outcome`: `NOT_RUN`, `RESOLVED`, `OPEN`, `PARTIAL`, `NOT_REPRODUCED`, or `BLOCKED`.
+
+This preserves the important case where a user accepts a risk while current evidence still says the
+finding is open. Stable IDs, direct evidence, impact, confidence, and smallest justified actions
+remain part of the Review packet.
 
 ### 8. Release drift as observable state
 
@@ -171,22 +189,23 @@ tag does not prove installation; an install does not prove byte identity with cu
 
 ## Real-world test set
 
-Four public repositories were pinned to exact revisions, kept read-only, and tested in proportion to
-their own contracts:
+Four public repositories were pinned to exact revisions, kept read-only, and used as architecture
+evidence:
 
-| Repository | Architecture preserved | Actual test result | Actionable finding |
-|---|---|---|---|
-| [`Academic-Paper-Review-Skill`](https://github.com/Conradgui/Academic-Paper-Review-Skill) | Review/polish modes, dual judgment axes, immutable ledger, stable delta IDs | Contract 28/28; proofing 10/10; full suite 92/95 with three Windows symlink errors | 65-character metadata; permission-aware isolated-auth testing |
-| [`zero-to-one-product-discovery`](https://github.com/Conradgui/zero-to-one-product-discovery) | Controller routing, stage purity, child-skill contracts, narrow workbench state | Unit suite 71/71 | 106-character metadata |
-| [`project-verifier-skill`](https://github.com/Conradgui/project-verifier-skill) | Four-stage control plane, decision envelope, separate state dimensions | Static contract 11/11; full suite 27/105 on Windows | Declare or adapt Bash and `python3` maintainer runtime |
-| [`immersive-motion-ui-skill`](https://github.com/Conradgui/immersive-motion-ui-skill) | Core/Library boundary, 14-capability manifest, audit/redesign, evidence tokens | Manifest CLI and data UI pass; ten selected commands share one Windows path root cause | Replace 16 unsafe file-URL pathname conversions |
+| Repository | Architecture evidence carried forward |
+|---|---|
+| [`Academic-Paper-Review-Skill`](https://github.com/Conradgui/Academic-Paper-Review-Skill) | Review/polish boundary, independent judgment axes, immutable ledger, and stable IDs |
+| [`zero-to-one-product-discovery`](https://github.com/Conradgui/zero-to-one-product-discovery) | Controller routing, stage purity, child-skill contracts, and narrow workbench state |
+| [`project-verifier-skill`](https://github.com/Conradgui/project-verifier-skill) | Four-stage control plane, decision envelope, and separate state dimensions |
+| [`immersive-motion-ui-skill`](https://github.com/Conradgui/immersive-motion-ui-skill) | Earned Core/Library boundary, capability manifest, audit/redesign split, and exact evidence outcomes |
 
 The test set directly sharpened Skill Polisher's failure attribution, causal collapse, target-owned
 evidence priority, and `Preserve / Change / Evidence limits` brief. It did not justify a new mode,
 manifest, mandatory risk tier, or bundled test runner.
 
-Read [Real-World Evaluation](./docs/REAL_WORLD_EVALUATION.md) for pinned revisions, commands,
-finding IDs, raw counts, causal grouping, and skipped checks.
+Historical commands, raw counts, platform-specific findings, and model/tooling limits remain in
+[Real-World Evaluation](./docs/REAL_WORLD_EVALUATION.md). They preserve evidence provenance; they are
+not the current compatibility matrix or a current-model benchmark.
 
 ## Install
 
@@ -230,10 +249,11 @@ Use $skill-polisher to fix finding SP-002 in this local skill, preserve the docu
 and validate only the affected behavior and near miss unless wider risk emerges.
 ```
 
-Recheck stable findings:
+Confirm and run the complete Recheck:
 
 ```text
-Use $skill-polisher to recheck SP-001 and SP-003 against the current revision and preserve their IDs.
+Use $skill-polisher to run the complete Recheck now against this submitted candidate and the full
+Maintenance Ledger.
 ```
 
 Audit release drift:
@@ -265,6 +285,7 @@ skill-polisher/
 │   └── REAL_WORLD_EVALUATION.zh.md
 ├── tests/
 │   ├── BEHAVIOR_CASES.md
+│   ├── test_lifecycle_contract.py
 │   ├── test_validate_repository.py
 │   └── fixtures/release-note-cleaner/
 ├── scripts/
@@ -274,6 +295,7 @@ skill-polisher/
     ├── license.txt
     ├── agents/openai.yaml
     └── references/
+        ├── maintenance-ledger.md
         ├── polish-and-recheck.md
         └── release-drift.md
 ```
@@ -287,21 +309,16 @@ human documentation mirrors project information without adding runtime rules.
 - Primary target: Codex Skill format and `agents/openai.yaml`.
 - Invocation: implicit for ordinary existing-skill diagnosis and maintenance requests.
 - Runtime dependencies: none beyond the active agent's normal repository and test tools.
-- Current runtime size: one 130-line-class `SKILL.md` plus two conditional references; no bundled
+- Current runtime shape: one lifecycle `SKILL.md` plus three conditional references; no bundled
   script or capability manifest is currently justified.
-- Local structure and quality lint: pass with zero warnings after the current iteration.
+- Repository validator and 11 lifecycle-contract and regression tests: pass for the current candidate.
 - Release: `v0.1.0`; [Windows and Ubuntu CI](https://github.com/Conradgui/skill-polisher/actions/workflows/validate.yml)
   run the same repository and skill checks.
-- Local `npx skills` installation: verified with one discovered skill and zero source-to-installed
-  drift.
-- Public source: fresh-cloned and validated from GitHub at the intended release commit.
-- Codex Skill Installer: the public skill URL installed into an isolated `CODEX_HOME`; all five
-  runtime files matched the remote source by relative path and SHA-256.
-- Agent Skills remote transport: the direct `npx` GitHub command reached the public URL but this
-  release runner's Git connection reset on three attempts. Installation from the fresh public clone
-  passed; a direct-transport success is not claimed for this environment.
-- Real-world evidence: four pinned repositories on the current Windows environment.
-- Not claimed by this release: macOS execution or fresh-independent-agent invocation transfer.
+- Unreleased source after `v0.1.0` adds the Maintenance Ledger lifecycle and local contract tests;
+  the tagged release remains `v0.1.0` until a new release is made.
+- Historical installation receipts and environment-specific evaluation results remain in the
+  [Changelog](./CHANGELOG.md) and [Real-World Evaluation](./docs/REAL_WORLD_EVALUATION.md); they are
+  not presented as current cross-platform or model benchmarks.
 
 ## Attribution and independence
 

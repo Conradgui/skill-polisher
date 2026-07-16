@@ -2,18 +2,20 @@
 
 [简体中文](./DESIGN.zh.md)
 
-This record explains why Skill Polisher has its current boundary and why several plausible mechanisms
-are intentionally absent. Runtime instructions remain canonical in
+This record explains the current maintenance lifecycle and the tradeoffs that keep it proportional.
+Runtime instructions remain canonical in
 [`SKILL.md`](../skills/skill-polisher/SKILL.md).
 
 ## Behavior contract
 
-| Branch | Representative request | Observable success | Failure or handoff |
+| Stage | Representative request | Observable success | Failure or handoff |
 |---|---|---|---|
-| Review | “Why does this existing skill misfire?” | Evidence-backed findings or an explicit no-finding result; no mutation | Ask only if the target or a decision-changing requirement is unavailable |
-| Polish | “Fix the confirmed routing defect in this skill.” | Minimal diff restores the affected contract and preserves invariants | Stop before remote, live, or newly expanded effects |
-| Recheck | “Recheck SP-002 after this patch.” | Stable finding ID receives an evidence-backed current status | Report `BLOCKED` when the original standard cannot be reconstructed |
-| Release drift | “Does the installed copy match the release?” | Source, version, CI, remote, and installed states are distinguished | Narrow the claim when a relevant state cannot be observed |
+| Review | “Why does this existing skill misfire?” | A read-only, decision-ready packet with stable findings and evidence limits | Return a `NON_DURABLE` ledger when no evidence path is authorized |
+| Decision | “Fix SP-002 now; defer SP-003.” | Finding-level decisions, order, scope, and baseline are explicit | Silence remains `PENDING`; changed scope refreshes approval |
+| Polish | “Apply the approved SP-002 batch.” | Minimal diff, targeted evidence, omissions, achieved effect, and residual risk are recorded | Stop after the batch; no comprehensive Recheck claim |
+| Recheck confirmation | “The candidate is committed.” | Ask whether to run complete Recheck and wait | A commit, handoff, or completed Polish is a signal, not consent |
+| Recheck | “Run the complete Recheck now.” | Every ledger finding and affected contract surface receives current evidence | Remaining issues return to the decision gate |
+| Release Drift | “Does the installed copy match the release?” | Source, version, CI, remote, and installed states remain separate | Release readiness requires a current runtime Recheck |
 | Rebuild handoff | “This skill needs a new identity and architecture.” | Polisher supplies a behavior contract and protected invariants | Skill Creator Pro owns rebuilding and first release |
 
 Near misses include reviewing ordinary application code, polishing a manuscript, and creating a new
@@ -21,75 +23,84 @@ skill from a repeated workflow. Those tasks belong to their domain workflow or S
 
 ## Design decisions
 
-### Implicit invocation
+### A lifecycle, not a mode picker
 
-Users often report “this skill keeps misfiring” without knowing the product name. Implicit invocation
-earns its context cost because the description is restricted to existing agent skills and names each
-genuine maintenance branch.
+Review, Polish, Recheck, and Release Drift are valid entry points, but they are not interchangeable
+authorities. A broad improvement request starts with Review. Polish consumes user-approved findings;
+Recheck consumes a submitted candidate plus explicit confirmation; release readiness consumes a
+current Recheck. A request naming an already approved finding can enter at Polish without repeating
+unrelated Review work.
 
-### Read-only default
+### Read-only Review with a reviewable artifact
 
-Diagnosis and mutation are different authorities. Review requests produce evidence without changing
-the target. A direct local fix request selects Polish, while release, credentials, and live effects
-remain separately authorized.
+Review keeps the target unchanged but must still produce a material the user can inspect. The
+Maintenance Ledger is written only to an already authorized evidence location. Without one, the full
+Markdown ledger is returned as `NON_DURABLE`; persisting evidence does not silently expand mutation
+authority.
 
-### Proportional rigor without mandatory tiers
+### One ledger, separate state dimensions
 
-Risk is multi-dimensional: one authorization line can matter more than a large documentation edit.
-The workflow therefore asks whether another check can change the diagnosis, action, or claim instead
-of assigning every task a ceremonial T0–T3 package. This is a cross-cutting discipline, not a new
-writing principle.
+One Maintenance Ledger owns findings, user decisions, Polish batches, Recheck outcomes, and optional
+release state. It appends history rather than copying facts into stage-specific documents. Decision,
+implementation progress, and evidence outcome remain separate so `decision: ACCEPT_RISK` can coexist
+with `recheck_outcome: OPEN`.
 
-### Independent axes without a composite score
+### Explicit Recheck confirmation
 
-Contract, system, evolution, and evidence answer different questions. Combining them into one score
-would let strong documentation hide a broken caller or let extensive tests hide a wrong outcome.
-Findings keep their axis and evidence.
+A commit, completed Polish batch, merge request, internal handoff, or release preparation makes
+Recheck reasonable; it does not start Recheck. The agent asks one focused question and waits. A
+current user message explicitly requesting Recheck already satisfies the gate. Confirmation is bound
+to runtime identity and material scope, so a changed runtime requires confirmation again.
 
-### Causal findings instead of failure-count theater
+### Complete decision coverage, proportional tools
 
-A broad suite may emit many failures from one missing runtime, permission, or path adapter. Skill
-Polisher preserves raw counts but attributes each non-pass result before creating findings, then
-collapses repeated symptoms under the earliest evidenced common cause. This prevents environmental
-noise from outranking the behavior and architecture under review.
+Recheck is comprehensive across every finding, modified behavior, preserved invariant, relevant
+regression, and near miss. It is not an instruction to run every available test. Proportional rigor
+still selects tools, but skipped and blocked checks remain visible and every finding receives an
+outcome.
 
-### Preserve, change, and evidence limits
+### Documentation reconciliation after Recheck
 
-Mature-skill maintenance needs an explicit preservation decision, not only a defect list. The report
-therefore names learned invariants to preserve, evidence-backed changes worth making, and limits that
-bound the supported claims. This makes a no-change decision as auditable as a patch recommendation.
+Recheck audits the documentation system but remains read-only. It summarizes the Review-to-Polish
+closure and capabilities added, changed, or removed, then checks each statement against its existing
+owner: README for current behavior, this record for rationale, Changelog for iteration history, tests
+for executable contracts, and the Maintenance Ledger for detailed evidence. A gap becomes a finding;
+an approved documentation-only repair preserves a runtime Recheck only when runtime content is
+unchanged.
 
-### No bundled scripts or capability manifest
+### Standalone drift audit versus release sequence
 
-The current workflow is linear and tool-agnostic. Existing platform validators already check skill
-structure, while evidence collection varies by target repository. No repeated deterministic operation
-currently earns a new script, and no modular routing graph earns a manifest. Forward evidence can
-change this decision later.
+Release Drift remains independently useful for diagnosing source, publication, CI, or installation
+mismatch. In a release path, however, it consumes a current Recheck for the exact runtime. A runtime
+repair invalidates Recheck; a documentation-only or version-only repair reruns only affected release
+gates.
+
+### Independent axes and causal findings
+
+Contract, system, evolution, and evidence answer different questions and keep separate findings. A
+broad suite may emit many failures from one runtime, permission, or path adapter; raw counts remain,
+but repeated symptoms collapse under the earliest evidenced cause.
+
+### No bundled runner or capability manifest
+
+The lifecycle is explicit but still small and tool-agnostic. A reference owns the ledger schema and
+repository tests enforce key gates. No repeated runtime operation earns a bundled script, and no
+module graph earns a capability manifest. Future behavioral evidence can change this decision.
 
 ## Evidence basis
 
 The design applies two independent project authorities:
 
-- [Skill Creator Pro](https://github.com/Conradgui/skill-creator-pro) supplies the behavior-contract,
-  information-hierarchy, forward-testing, and first-release workflow.
+- [Skill Creator Pro](https://github.com/Conradgui/skill-creator-pro) supplies behavior contracts,
+  information hierarchy, forward testing, explicit decisions, and release engineering.
 - [Matt Pocock-inspired Skill Writing](https://github.com/Conradgui/matt-pocock-inspired-skill-writing)
-  supplies the twelve writing principles and proportional-evidence interpretation.
+  supplies the twelve writing principles, durable artifact model, and proportional-evidence
+  interpretation.
 
-Three real skill systems supplied architecture studies:
+Four real skill systems supplied architecture evidence: `paper-review` for immutable ledgers and
+stable IDs, `project-verifier` for separate state dimensions, `zero-to-one-product-discovery` for
+stage-pure orchestration, and `immersive-motion-ui` for earned manifests and verifier boundaries.
+The expanded [real-world evaluation](./REAL_WORLD_EVALUATION.md) records the commands and evidence.
 
-| System | Learned invariant carried into Skill Polisher |
-|---|---|
-| `immersive-motion-ui` | A capability graph, fallback, and verifier may be earned architecture rather than excess complexity |
-| `project-verifier` | Progress, outcome, execution scope, and claim eligibility must not be collapsed |
-| `paper-review` | Review and mutation require different modes; edits may need an invariant ledger and rechecks need stable IDs |
-
-A fourth study, `zero-to-one-product-discovery`, added evidence for controller-owned routing,
-stage-pure orchestration, narrow persistent state, and machine-validated artifact boundaries. The
-expanded [real-world evaluation](./REAL_WORLD_EVALUATION.md) records the commands and feedback loop.
-
-These studies also exposed a weakness in snapshot-only review: incidental Windows findings can be
-real without being the highest-value architectural conclusion. Skill Polisher explicitly ranks
-behavior and architecture first unless platform behavior breaks a support claim.
-
-The projects remain independent. This repository does not claim that Matt Pocock, OpenAI, or the
-four study repositories define or endorse Skill Polisher's workflow.
+These projects remain independent. This repository does not claim that Matt Pocock, OpenAI, or the
+study repositories define or endorse Skill Polisher's workflow.

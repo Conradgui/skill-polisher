@@ -2,67 +2,68 @@
 
 [English](./DESIGN.md)
 
-本文解释 Skill Polisher 当前边界的原因，也说明为什么若干看似合理的机制被有意省略。运行时指令仍以 [`SKILL.md`](../skills/skill-polisher/SKILL.md) 为唯一权威来源。
+本文解释当前维护生命周期及其保持投入合宜的权衡。运行时指令仍以
+[`SKILL.md`](../skills/skill-polisher/SKILL.md) 为唯一权威来源。
 
 ## 行为契约
 
-| 分支 | 代表性请求 | 可观察的成功条件 | 失败或交接行为 |
+| 阶段 | 代表性请求 | 可观察的成功条件 | 失败或交接行为 |
 |---|---|---|---|
-| Review | “为什么这个既有 Skill 会误触发？” | 给出有证据的 findings 或明确的无 finding 结论；不修改文件 | 只有在目标缺失或用户决定会改变结论时才提问 |
-| Polish | “修复这个 Skill 已确认的路由问题。” | 最小 diff 恢复受影响契约并保留不变量 | 在远程、真实系统或新增范围的副作用前停止 |
-| Recheck | “补丁完成后复核 SP-002。” | 稳定 finding ID 获得证据支持的当前状态 | 无法重建原始标准时报告 `BLOCKED` |
-| Release drift | “安装副本与 release 是否一致？” | 分别说明源码、版本、CI、远程与安装状态 | 无法观察相关状态时收窄结论 |
-| 重建交接 | “这个 Skill 需要新身份和新架构。” | Polisher 给出行为契约与受保护不变量 | Skill Creator Pro 负责重建和首次发布 |
+| Review | “为什么这个既有 Skill 会误触发？” | 只读、可决策的证据包，包含稳定 finding 与证据边界 | 没有获授权的证据路径时返回 `NON_DURABLE` ledger |
+| 决策 | “现在修 SP-002，暂缓 SP-003。” | finding 级决策、顺序、范围和 baseline 明确 | 沉默保持 `PENDING`；范围改变后刷新授权 |
+| Polish | “执行获批的 SP-002 批次。” | 最小 diff、定向证据、未改项、达成效果和残余风险已记录 | 批次后停止；不冒充完成全面 Recheck |
+| Recheck 确认 | “候选已经提交。” | 询问是否执行完整 Recheck 并等待 | commit、交接或 Polish 完成只是信号，不是同意 |
+| Recheck | “现在执行完整 Recheck。” | 每项 ledger finding 与受影响 contract surface 都获得当前证据 | 剩余问题返回决策门 |
+| Release Drift | “安装副本是否与 release 一致？” | source、version、CI、remote 与 installed 状态保持分开 | 发布就绪要求当前 runtime Recheck |
+| 重建交接 | “这个 Skill 需要新身份和新架构。” | Polisher 提供行为契约与受保护不变量 | Skill Creator Pro 负责重建和首次发布 |
 
-近似但不应触发的任务包括审核普通应用代码、润色论文，以及把重复工作流创建成新 Skill。这些任务应交给对应领域工作流或 Skill Creator Pro。
+近似但不应触发的任务包括审核普通应用代码、润色论文，以及从重复工作流创建新 Skill。这些任务属于对应领域工作流或 Skill Creator Pro。
 
 ## 设计决策
 
-### 隐式调用
+### 生命周期，而不是模式选择器
 
-用户经常只会说“这个 Skill 总是误触发”，而不会知道产品名称。description 已限定为既有 Agent Skill，并覆盖每个真实维护分支，因此隐式调用所占用的上下文成本是合理的。
+Review、Polish、Recheck 与 Release Drift 都可以成为合法入口，但它们不是可互换的权限。宽泛改进从 Review 开始；Polish 消费用户批准的 finding；Recheck 消费已提交候选与明确确认；发布就绪消费当前 Recheck。已经明确获批的 finding 可以直接进入 Polish，不重复无关 Review。
 
-### 默认只读
+### 只读 Review 与可审阅工件
 
-诊断与修改属于不同权限。Review 请求只产出证据，不改变目标。明确要求本地修复时进入 Polish；发布、凭据与真实系统副作用仍需单独授权。
+Review 保持目标不变，但仍必须生成用户可检查的材料。Maintenance Ledger 只写入已经获授权的证据位置；没有该位置时，以 `NON_DURABLE` 形式返回完整 Markdown ledger。持久化证据不能静默扩大修改权限。
 
-### 适度严谨，但不强制分级
+### 一份 ledger，分开的状态维度
 
-风险并不由改动行数决定：一行授权规则可能比大段文档修改更重要。因此工作流判断“下一项检查能否改变诊断、行动或结论”，而不是给每项任务套用固定的 T0–T3 仪式。这是一条横向运行纪律，不是新增的写作原则。
+一份 Maintenance Ledger 负责 finding、用户决策、Polish 批次、Recheck 结果和可选发布状态。它追加历史，不把事实复制到多个阶段文档。决策、实现进度和证据结果保持分开，因此 `decision: ACCEPT_RISK` 可以与 `recheck_outcome: OPEN` 同时存在。
 
-### 独立维度，不计算总分
+### 显式 Recheck 确认
 
-Contract、system、evolution 与 evidence 回答不同问题。合并成单一分数，会让优质文档掩盖坏掉的 caller，或者让大量测试掩盖错误的目标。每个 finding 都保留自己的维度和证据。
+commit、完成的 Polish 批次、merge request、内部交接或准备发布会让 Recheck 变得合理，但不会启动它。Agent 提出一个聚焦问题并等待。用户当前消息已明确要求 Recheck 时，该消息已经满足门槛。确认绑定 runtime identity 与 material scope；runtime 变化后需要重新确认。
 
-### 因果 finding，而不是失败数量表演
+### 完整决策面覆盖，适度工具投入
 
-一个缺失的 runtime、权限或路径适配器，可能让大型套件产生许多失败。Skill Polisher 会保留原始数量，但先归因每个非通过结果，再把重复症状折叠到有证据的最早共同原因。这样环境噪声不会压过被审核的行为和架构。
+Recheck 全面覆盖每项 finding、修改行为、受保护不变量、相关回归与 near miss，但不要求运行所有可用测试。Proportional rigor 仍负责选择工具；跳过与阻塞检查必须可见，每项 finding 都必须获得结果。
 
-### Preserve、change 与 evidence limits
+### Recheck 后的文档体系核对
 
-成熟 Skill 的维护需要明确说明保留什么，而不只是列出缺陷。报告因此分别说明应保护的 learned invariants、值得执行的证据化修改，以及限制结论范围的证据边界。这样，无修改结论也能像补丁建议一样可审计。
+Recheck 审核文档体系，但保持只读。它汇总 Review 到 Polish 的收尾情况与新增、调整、退役的能力，再按现有职责核对：README 负责当前行为，本文负责设计理由，Changelog 负责迭代历史，测试负责可执行合同，Maintenance Ledger 负责详细证据。缺口形成 finding；获批的纯文档修复只有在 runtime 内容不变时才保留当前 Recheck。
 
-### 不内置脚本或 capability manifest
+### 独立 drift audit 与发布顺序
 
-当前工作流是线性的，也不依赖特定工具。既有平台 validator 已能检查 Skill 结构，而证据采集会随目标仓库变化。目前没有反复出现的确定性操作值得新增脚本，也没有模块化路由图值得引入 manifest。后续前向证据可以改变这一决定。
+Release Drift 仍可独立诊断源码、发布、CI 或安装不一致。但在发布路径中，它必须消费与精确 runtime 对应的当前 Recheck。runtime 修复会使 Recheck 失效；仅文档或版本的修复只重跑受影响 release gate。
+
+### 独立维度与因果 finding
+
+Contract、system、evolution 与 evidence 回答不同问题并保留独立 finding。大型套件可能因一个 runtime、权限或路径 adapter 产生许多失败；原始数量保留，但重复症状归并到最早有证据的共同原因。
+
+### 不内置 runner 或 capability manifest
+
+生命周期明确，但仍然小型且与工具无关。一个 reference 负责 ledger schema，仓库测试执行关键门槛。当前没有重复运行时操作值得新增 bundled script，也没有模块图值得引入 capability manifest。后续行为证据可以改变该决定。
 
 ## 证据基础
 
 本设计应用两个相互独立的项目权威：
 
-- [Skill Creator Pro](https://github.com/Conradgui/skill-creator-pro) 提供行为契约、信息层级、前向测试与首次发布工作流。
-- [Matt Pocock-inspired Skill Writing](https://github.com/Conradgui/matt-pocock-inspired-skill-writing) 提供十二条写作原则和 proportional evidence 的解释。
+- [Skill Creator Pro](https://github.com/Conradgui/skill-creator-pro) 提供行为契约、信息层级、前向测试、显式决策与发布工程。
+- [Matt Pocock-inspired Skill Writing](https://github.com/Conradgui/matt-pocock-inspired-skill-writing) 提供十二条写作原则、持久工件模型和 proportional evidence 解释。
 
-三个真实 Skill 系统提供了架构研究对象：
+四个真实 Skill 系统提供架构证据：`paper-review` 支持不可变 ledger 与稳定 ID，`project-verifier` 支持独立状态维度，`zero-to-one-product-discovery` 支持阶段纯度，`immersive-motion-ui` 支持有证据成本的 manifest 与 verifier 边界。扩展的[真实仓库评估](./REAL_WORLD_EVALUATION.zh.md)记录命令和证据。
 
-| 系统 | Skill Polisher 吸收的 learned invariant |
-|---|---|
-| `immersive-motion-ui` | capability graph、fallback 与 verifier 可能是迭代换来的架构，而不是多余复杂度 |
-| `project-verifier` | progress、outcome、execution scope 与 claim eligibility 不能被合并 |
-| `paper-review` | 审核与修改需要不同模式；编辑可能需要不变量账本；复核需要稳定 ID |
-
-第四个研究对象 `zero-to-one-product-discovery` 补充了 controller 单一所有权、阶段纯度、窄范围持久状态和机器可验证产物边界的证据。扩展后的[真实仓库评估](./REAL_WORLD_EVALUATION.zh.md)记录了命令和反哺过程。
-
-这些研究也暴露了只看快照的审核弱点：偶发的 Windows 问题可以是真问题，但未必是价值最高的架构结论。因此 Skill Polisher 会先排序行为和架构；只有平台行为违反明确支持声明时，才提高其优先级。
-
-这些项目彼此独立。本仓库不声称 Matt Pocock、OpenAI 或四个研究仓库定义或认可 Skill Polisher 的工作流。
+这些项目保持独立。本仓库不声称 Matt Pocock、OpenAI 或研究对象定义或认可 Skill Polisher 的工作流。
